@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+    stages {
+        stage('STG1-8721368T') {
+            steps {
+                echo 'STG1-8721368T: Release environment For CCWA is ready.'
+            }
+        }
+        stage('STG2-8721368T') {
+            steps {
+                sh 'docker rm -f CCWA-8721368T-appsvr || true'
+                sh 'docker run -d --name CCWA-8721368T-appsvr -p 33100:80 ccwa-8721368t-temp-svr-image /bin/bash -c "service apache2 start && tail -f /dev/null"'
+                echo 'STG2-8721368T: CCWA App Server is setup and running'
+            }
+        }
+        stage('STG3-8721368T') {
+            parallel {
+                stage('CCWA-Scope1-8721368T') {
+                    steps {
+                        echo 'Scope1 Validation Status Generated'
+                    }
+                }
+                stage('CCWA-Scope2-8721368T') {
+                    steps {
+                        echo 'Scope2 Validation Status Generated'
+                    }
+                }
+                stage('CCWA-Scope3-8721368T') {
+                    steps {
+                        echo 'Scope3 Validation Status Generated'
+                    }
+                }
+            }
+        }
+        stage('STG4-8721368T') {
+            steps {
+                input message: 'After validation, proceed or abort the pipeline?'
+                echo 'STG4-8721368T: Approve to continue the pipeline.'
+            }
+        }
+        stage('STG5-8721368T') {
+            steps {
+                echo 'STG5-8721368T: Getting ready for next phase'
+            }
+        }
+    }
+}
